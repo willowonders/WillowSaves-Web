@@ -31,6 +31,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "WillowSaves — Personal Finance Tracker",
   description: "Track your savings, expenses, and allowances with the help of Willow the cat.",
+  manifest: '/manifest.json',
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',

@@ -1,0 +1,22 @@
+{
+  "name": "WillowSaves — Personal Finance Tracker",
+  "short_name": "WillowSaves",
+  "description": "Track your savings, expenses, and allowances with the help of Willow the cat.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F2F3F5",
+  "theme_color": "#2E8540",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/hero-mascot.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
