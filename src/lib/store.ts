@@ -294,9 +294,9 @@ export function useSavings() {
 
   const totalSaved = _allowances.reduce((sum, a) => sum + a.amount, 0);
   const totalExpenses = _expenses.reduce((sum, e) => sum + e.amount, 0);
-  const totalBankDeposited = _bankState.transactions.filter(t => t.type === 'deposit').reduce((sum, t) => sum + t.amount, 0);
+  const totalBankDeposited = _bankState.transactions.filter(t => t.type === 'deposit' && t.source === 'savings').reduce((sum, t) => sum + t.amount, 0);
   const totalBankWithdrawn = _bankState.transactions.filter(t => t.type === 'withdraw').reduce((sum, t) => sum + t.amount, 0);
-  const totalGcashDeposited = _gcashState.transactions.filter(t => t.type === 'deposit').reduce((sum, t) => sum + t.amount, 0);
+  const totalGcashDeposited = _gcashState.transactions.filter(t => t.type === 'deposit' && t.source === 'savings').reduce((sum, t) => sum + t.amount, 0);
   const totalGcashWithdrawn = _gcashState.transactions.filter(t => t.type === 'withdraw').reduce((sum, t) => sum + t.amount, 0);
   const totalDeposited = totalBankDeposited + totalGcashDeposited;
   const totalWithdrawn = totalBankWithdrawn + totalGcashWithdrawn;

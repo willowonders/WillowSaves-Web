@@ -28,6 +28,7 @@ create table if not exists bank_transactions (
   amount numeric not null,
   type text not null check (type in ('deposit', 'withdraw')),
   source text default 'other',
+  account text default 'bank',
   note text default '',
   date text not null,
   created_at timestamp with time zone default now(),

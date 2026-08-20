@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState } from 'react';
 import { useBank, useGcash, useUndo } from '@/lib/store';
-import { formatCurrency, cn } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import { BankTransactionList } from '@/components/bank/BankTransactionList';
+import { BankEditModal } from '@/components/bank/BankEditModal';
 import { UndoToast } from '@/components/ui/UndoToast';
 import { BankTransaction } from '@/types';
 
@@ -11,19 +12,15 @@ export default function BankPage() {
   const bank = useBank();
   const gcash = useGcash();
   const { pendingItem, queueUndo, dismissUndo } = useUndo();
+  const [editingTx, setEditingTx] = useState<BankTransaction | null>(null);
 
-  const allTransactions = useMemo(() =>
-    [...bank.transactions.map(t => ({ ...t, account: t.account || 'bank' as const })),
-     ...gcash.transactions.map(t => ({ ...t, account: 'gcash' as const }))]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-    [bank.transactions, gcash.transactions]
-  );
-
-  const handleDeleteTransaction = (id: string) => {
-    const tx = allTransactions.find(t => t.id === id);
+  const handleDeleteTransaction = (id: string, account: 'bank' | 'gcash') => {
+    const tx = account === 'gcash'
+      ? gcash.transactions.find(t => t.id === id)
+      : bank.transactions.find(t => t.id === id);
     if (!tx) return;
-    queueUndo({ type: 'bank', data: tx });
-    if (tx.account === 'gcash') {
+    queueUndo({ type: 'bank', data: { ...tx, account } });
+    if (account === 'gcash') {
       gcash.deleteTransaction(id);
     } else {
       bank.deleteTransaction(id);
@@ -66,22 +63,34 @@ export default function BankPage() {
         </div>
       </div>
 
-      {/* Transactions List */}
-      <div className="bg-white dark:bg-canvas-dark-elevated rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-5">
-        <h3 className="text-sm font-bold text-ink dark:text-ink-dark mb-1">All Transactions</h3>
-        <p className="text-[11px] text-shade-400 mb-4">Bank and GCASH transactions</p>
+      {/* Bank Transactions */}
+      <div className="bg-white dark:bg-canvas-dark-elevated rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-5 mb-6">
+        <h3 className="text-sm font-bold text-ink dark:text-ink-dark mb-1">Bank Transactions</h3>
+        <p className="text-[11px] text-shade-400 mb-4">Deposits and withdrawals from your bank account</p>
 
         <BankTransactionList
-          transactions={allTransactions}
-          onDelete={handleDeleteTransaction}
+          transactions={bank.transactions}
+          onEdit={(tx) => setEditingTx({ ...tx, account: 'bank' })}
+          onDelete={(id) => handleDeleteTransaction(id, 'bank')}
         />
-
-        {allTransactions.length === 0 && (
-          <div className="py-8 text-center text-sm text-shade-40">
-            No transactions yet. Use the + button to deposit or withdraw!
-          </div>
-        )}
       </div>
+
+      {/* GCASH Transactions */}
+      <div className="bg-white dark:bg-canvas-dark-elevated rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-5">
+        <h3 className="text-sm font-bold text-ink dark:text-ink-dark mb-1">GCASH Transactions</h3>
+        <p className="text-[11px] text-shade-400 mb-4">Deposits and withdrawals from your GCASH account</p>
+
+        <BankTransactionList
+          transactions={gcash.transactions}
+          onEdit={(tx) => setEditingTx({ ...tx, account: 'gcash' })}
+          onDelete={(id) => handleDeleteTransaction(id, 'gcash')}
+        />
+      </div>
+
+      {/* Edit Modal */}
+      {editingTx && (
+        <BankEditModal transaction={editingTx} onClose={() => setEditingTx(null)} />
+      )}
 
       <UndoToast pendingItem={pendingItem} onUndo={handleUndo} onDismiss={dismissUndo} />
     </div>
