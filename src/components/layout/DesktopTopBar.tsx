@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { HelpModal } from '@/components/ui/HelpModal';
 import { useFab } from '@/lib/fab-context';
 import { useAuth } from '@/lib/auth-context';
 import { cn } from '@/lib/utils';
-import { Plus, Receipt, Banknote, ArrowDownToLine, ArrowUpFromLine, User, LogOut } from 'lucide-react';
+import { Plus, Receipt, Banknote, ArrowDownToLine, ArrowUpFromLine, User, LogOut, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function DesktopTopBar() {
@@ -13,6 +14,7 @@ export function DesktopTopBar() {
   const { user, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -120,8 +122,17 @@ export function DesktopTopBar() {
           </AnimatePresence>
         </div>
 
+        <button
+          onClick={() => setHelpOpen(true)}
+          className="h-9 w-9 rounded-full bg-shade-20/40 dark:bg-shade-70/40 flex items-center justify-center cursor-pointer hover:bg-shade-30/40 transition-colors"
+        >
+          <HelpCircle size={16} className="text-shade-50" />
+        </button>
+
         <ThemeToggle />
       </div>
+
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
     </header>
   );
 }

@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useFab } from '@/lib/fab-context';
 import { cn } from '@/lib/utils';
 import { Plus, Receipt, Banknote, ArrowDownToLine, ArrowUpFromLine, LayoutDashboard, PiggyBank, Landmark, CreditCard } from 'lucide-react';
@@ -75,12 +74,6 @@ export function Sidebar() {
         </div>
       </nav>
 
-      {/* Bottom: Theme toggle only */}
-      <div className="p-3 border-t border-hairline-light dark:border-hairline-dark">
-        <div className="flex justify-center">
-          <ThemeToggle />
-        </div>
-      </div>
     </aside>
   );
 }

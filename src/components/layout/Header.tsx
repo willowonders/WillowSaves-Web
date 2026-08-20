@@ -4,9 +4,10 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { HelpModal } from '@/components/ui/HelpModal';
 import { useFab } from '@/lib/fab-context';
 import { cn } from '@/lib/utils';
-import { Plus, Receipt, Banknote, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
+import { Plus, Receipt, Banknote, ArrowDownToLine, ArrowUpFromLine, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navTabs = [
@@ -20,6 +21,7 @@ export function Header() {
   const pathname = usePathname();
   const { openModal } = useFab();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -74,12 +76,20 @@ export function Header() {
             })}
           </nav>
 
-          {/* Right: Theme toggle only */}
-          <div className="flex items-center">
+          {/* Right: Help + Theme toggle */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setHelpOpen(true)}
+              className="h-8 w-8 rounded-full flex items-center justify-center cursor-pointer hover:bg-shade-20/50 dark:hover:bg-shade-70/50 transition-colors"
+            >
+              <HelpCircle size={18} className="text-shade-50" />
+            </button>
             <ThemeToggle />
           </div>
         </div>
       </header>
+
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
 
       {/* Floating FAB - mobile only */}
       <div className="lg:hidden fixed bottom-6 right-6 z-50">
