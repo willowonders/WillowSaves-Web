@@ -100,9 +100,9 @@ export function SavingsChart({ view, selectedMonth, selectedYear }: SavingsChart
         <p className="text-xs font-bold text-shade-60 uppercase tracking-wider">Savings Trend</p>
       </div>
 
-      <div className="h-48">
+      <div className="h-48 overflow-hidden">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+          <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E4E4EC" vertical={false} />
             <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#7B7B8A' }} axisLine={false} tickLine={false} interval={0} angle={view === 'monthly' ? -45 : 0} textAnchor={view === 'monthly' ? 'end' : 'middle'} height={view === 'monthly' ? 50 : 30} />
             <YAxis tick={{ fontSize: 11, fill: '#7B7B8A' }} axisLine={false} tickLine={false} />

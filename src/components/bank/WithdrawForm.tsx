@@ -79,7 +79,7 @@ export function WithdrawForm({ onWithdraw, onClose, bankBalance, gcashBalance }:
           value={note}
           onChange={e => setNote(e.target.value)}
           placeholder="e.g. ATM withdrawal"
-          className="w-full px-4 py-3 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-sm focus:outline-none focus:border-primary transition-colors"
+          className="w-full px-4 py-3 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-base focus:outline-none focus:border-primary transition-colors"
         />
       </div>
 

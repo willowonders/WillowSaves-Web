@@ -64,7 +64,7 @@ export function AllowanceForm({ editingAllowance, onSave, onClose }: AllowanceFo
           value={label}
           onChange={e => setLabel(e.target.value)}
           placeholder="e.g. Daily Allowance"
-          className="w-full px-4 py-3 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-sm focus:outline-none focus:border-primary transition-colors"
+          className="w-full px-4 py-3 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-base focus:outline-none focus:border-primary transition-colors"
         />
       </div>
 
@@ -74,7 +74,7 @@ export function AllowanceForm({ editingAllowance, onSave, onClose }: AllowanceFo
           type="date"
           value={date}
           onChange={e => setDate(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-sm focus:outline-none focus:border-primary transition-colors"
+          className="w-full px-4 py-3 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-base focus:outline-none focus:border-primary transition-colors"
         />
       </div>
 

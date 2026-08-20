@@ -104,7 +104,7 @@ export default function DashboardPage() {
       <div className="bg-white dark:bg-canvas-dark-elevated rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-5 mb-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5">
           <h2 className="text-lg font-heading font-bold text-ink dark:text-ink-dark">Statistics</h2>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <div className="flex items-center gap-1 bg-shade-20/40 dark:bg-shade-70/40 rounded-full p-0.5">
               {(['daily', 'weekly', 'monthly', 'yearly'] as const).map(v => (
                 <button

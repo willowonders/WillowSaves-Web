@@ -113,7 +113,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               <input
                 type="email"
                 {...register('email')}
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-2.5 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-base font-medium focus:outline-none focus:border-primary transition-colors"
                 placeholder="you@email.com"
               />
               {errors.email && (
@@ -128,7 +128,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               <input
                 type="password"
                 {...register('password')}
-                className="w-full px-4 py-2.5 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-2.5 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-base font-medium focus:outline-none focus:border-primary transition-colors"
                 placeholder="Enter your password"
               />
               {errors.password && (
@@ -144,7 +144,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 <input
                   type="password"
                   {...register('confirmPassword')}
-                  className="w-full px-4 py-2.5 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                  className="w-full px-4 py-2.5 rounded-xl border-2 border-hairline-light dark:border-hairline-dark bg-white dark:bg-canvas-dark-card text-ink dark:text-ink-dark text-base font-medium focus:outline-none focus:border-primary transition-colors"
                   placeholder="Confirm your password"
                 />
                 {(errors as any).confirmPassword && (
