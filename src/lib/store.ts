@@ -78,11 +78,12 @@ async function initializeStore() {
   _initialized = true;
 
   if (USE_SUPABASE) {
-    const [expensesRes, allowancesRes, bankTxRes, bankStateRes] = await Promise.all([
+    const [expensesRes, allowancesRes, bankTxRes, bankStateRes, gcashStateRes] = await Promise.all([
       supabase.from('expenses').select('*').eq('user_id', _userId).order('created_at', { ascending: false }),
       supabase.from('allowances').select('*').eq('user_id', _userId).order('created_at', { ascending: false }),
       supabase.from('bank_transactions').select('*').eq('user_id', _userId).order('created_at', { ascending: false }),
-      supabase.from('bank_state').select('balance').eq('user_id', _userId).single(),
+      supabase.from('bank_state').select('balance').eq('user_id', _userId).eq('id', 'main').single(),
+      supabase.from('bank_state').select('balance').eq('user_id', _userId).eq('id', 'gcash').single(),
     ]);
     const allTx = (bankTxRes.data || []).map((r: any) => ({ id: r.id, amount: r.amount, type: r.type, source: r.source || 'other', account: r.account || 'bank', note: r.note || '', date: r.date, createdAt: r.created_at }));
     _expenses = (expensesRes.data || []).map((r: any) => ({ id: r.id, amount: r.amount, category: r.category, date: r.date, notes: r.notes || '', createdAt: r.created_at }));
@@ -94,7 +95,7 @@ async function initializeStore() {
       transactions: bankTx,
     };
     _gcashState = {
-      balance: gcashTx.filter(t => t.type === 'deposit').reduce((s, t) => s + t.amount, 0) - gcashTx.filter(t => t.type === 'withdraw').reduce((s, t) => s + t.amount, 0),
+      balance: gcashStateRes.data?.balance ?? 0,
       transactions: gcashTx,
     };
   } else {
@@ -205,7 +206,7 @@ function createBankHooks(stateRef: { current: BankState }, storageKey: string, s
       saveToStorage(storageKey, stateRef.current);
       if (USE_SUPABASE && _userId) {
         await supabase.from('bank_transactions').insert({ id: transaction.id, amount, type: 'deposit', source, account: transaction.account, note, date: transaction.date, user_id: _userId });
-        const { data: existing } = await supabase.from('bank_state').select('balance').eq('user_id', _userId).single();
+        const { data: existing } = await supabase.from('bank_state').select('balance').eq('user_id', _userId).eq('id', supabaseId).single();
         await supabase.from('bank_state').upsert({ user_id: _userId, id: supabaseId, balance: (existing?.balance ?? 0) + amount });
       }
       notify();
@@ -219,7 +220,7 @@ function createBankHooks(stateRef: { current: BankState }, storageKey: string, s
       saveToStorage(storageKey, stateRef.current);
       if (USE_SUPABASE && _userId) {
         await supabase.from('bank_transactions').insert({ id: transaction.id, amount, type: 'withdraw', source: 'other', account: transaction.account, note, date: transaction.date, user_id: _userId });
-        const { data: existing } = await supabase.from('bank_state').select('balance').eq('user_id', _userId).single();
+        const { data: existing } = await supabase.from('bank_state').select('balance').eq('user_id', _userId).eq('id', supabaseId).single();
         await supabase.from('bank_state').upsert({ user_id: _userId, id: supabaseId, balance: Math.max(0, (existing?.balance ?? 0) - amount) });
       }
       notify();
@@ -235,7 +236,7 @@ function createBankHooks(stateRef: { current: BankState }, storageKey: string, s
       saveToStorage(storageKey, stateRef.current);
       if (USE_SUPABASE && _userId) {
         await supabase.from('bank_transactions').delete().eq('id', id);
-        const { data: existing } = await supabase.from('bank_state').select('balance').eq('user_id', _userId).single();
+        const { data: existing } = await supabase.from('bank_state').select('balance').eq('user_id', _userId).eq('id', supabaseId).single();
         const adj = tx.type === 'deposit' ? -tx.amount : tx.amount;
         await supabase.from('bank_state').upsert({ user_id: _userId, id: supabaseId, balance: Math.max(0, (existing?.balance ?? 0) + adj) });
       }
