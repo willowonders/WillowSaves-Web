@@ -7,14 +7,14 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { HelpModal } from '@/components/ui/HelpModal';
 import { useFab } from '@/lib/fab-context';
 import { cn } from '@/lib/utils';
-import { Plus, Receipt, Banknote, ArrowDownToLine, ArrowUpFromLine, HelpCircle } from 'lucide-react';
+import { Plus, Receipt, Banknote, ArrowDownToLine, ArrowUpFromLine, HelpCircle, LayoutDashboard, PiggyBank, Landmark, CreditCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navTabs = [
-  { href: '/', label: 'Dashboard' },
-  { href: '/savings', label: 'Savings' },
-  { href: '/bank', label: 'Bank' },
-  { href: '/expenses', label: 'Expenses' },
+  { href: '/', label: 'Home', icon: LayoutDashboard },
+  { href: '/savings', label: 'Savings', icon: PiggyBank },
+  { href: '/bank', label: 'Bank', icon: Landmark },
+  { href: '/expenses', label: 'Expenses', icon: CreditCard },
 ];
 
 export function Header() {
@@ -44,37 +44,16 @@ export function Header() {
   return (
     <>
       {/* Top bar - mobile only */}
-      <header className="lg:hidden h-auto min-h-14 bg-white dark:bg-canvas-dark-elevated border-b border-hairline-light dark:border-hairline-dark sticky top-0 z-30">
-        <div className="flex flex-wrap items-center gap-2 px-4 py-2">
+      <header className="lg:hidden h-14 bg-white dark:bg-canvas-dark-elevated border-b border-hairline-light dark:border-hairline-dark sticky top-0 z-30">
+        <div className="flex items-center justify-between px-4 h-full">
           {/* Left: Logo */}
-          <div className="flex items-center gap-2 mr-2">
+          <div className="flex items-center gap-2">
             <img src="/logo-light.png" alt="WillowSaves" className="w-8 h-8 rounded-full object-cover dark:hidden" />
             <img src="/logo-dark.png" alt="WillowSaves" className="w-8 h-8 rounded-full object-cover hidden dark:block" />
             <span className="font-display text-base font-bold text-ink dark:text-ink-dark">
               WillowSaves
             </span>
           </div>
-
-          {/* Nav tabs - wraps on mobile */}
-          <nav className="flex items-center gap-1 flex-wrap flex-1 justify-center">
-            {navTabs.map((tab) => {
-              const isActive = pathname === tab.href;
-              return (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  className={cn(
-                    'px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200',
-                    isActive
-                      ? 'bg-primary text-on-primary'
-                      : 'text-shade-50 dark:text-shade-40 hover:text-ink dark:hover:text-ink-dark hover:bg-shade-20/50 dark:hover:bg-shade-70/50'
-                  )}
-                >
-                  {tab.label}
-                </Link>
-              );
-            })}
-          </nav>
 
           {/* Right: Help + Theme toggle */}
           <div className="flex items-center gap-1">
@@ -91,8 +70,33 @@ export function Header() {
 
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
 
+      {/* Bottom bar - mobile only */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-canvas-dark-elevated border-t border-hairline-light dark:border-hairline-dark z-40 pb-safe">
+        <div className="flex items-center justify-around h-16">
+          {navTabs.map((tab) => {
+            const isActive = pathname === tab.href;
+            const Icon = tab.icon;
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                className={cn(
+                  'flex flex-col items-center justify-center gap-0.5 w-full h-full transition-colors',
+                  isActive
+                    ? 'text-primary'
+                    : 'text-shade-40 dark:text-shade-50'
+                )}
+              >
+                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                <span className="text-[10px] font-semibold">{tab.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
       {/* Floating FAB - mobile only */}
-      <div className="lg:hidden fixed bottom-6 right-6 z-50">
+      <div className="lg:hidden fixed bottom-20 right-6 z-50">
         <div ref={menuRef} className="relative">
           <motion.button
             onClick={() => setMenuOpen(!menuOpen)}

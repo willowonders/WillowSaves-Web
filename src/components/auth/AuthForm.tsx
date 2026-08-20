@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/client';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -71,7 +72,10 @@ export function AuthForm({ mode }: AuthFormProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F2F3F5] dark:bg-canvas-dark flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F2F3F5] dark:bg-canvas-dark flex items-center justify-center p-4 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         <div className="bg-white dark:bg-canvas-dark-elevated rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-8">
           <div className="flex items-center justify-center gap-2.5 mb-8">

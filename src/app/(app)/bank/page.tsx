@@ -47,7 +47,7 @@ export default function BankPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-24 lg:pb-0">
       {/* Hero - Both balances */}
       <div className="bg-gradient-to-br from-[#F2F3F5] via-[#E8F5E0] to-[#F2F3F5] dark:from-canvas-dark dark:via-canvas-dark-elevated dark:to-canvas-dark rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 mb-6">
         <p className="text-[11px] font-bold uppercase tracking-wider text-shade-50 mb-3">Bank Account</p>

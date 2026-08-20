@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Nunito, Poppins, Fredoka } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/theme-provider";
@@ -21,6 +21,12 @@ const fredoka = Fredoka({
   variable: "--font-fredoka",
   weight: ["400", "500", "600", "700"],
 });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const metadata: Metadata = {
   title: "WillowSaves — Personal Finance Tracker",

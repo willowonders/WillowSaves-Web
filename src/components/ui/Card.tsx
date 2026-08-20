@@ -31,7 +31,7 @@ export function Card({ children, variant = 'default', className, style, onClick 
       whileHover={onClick ? { scale: 1.01 } : undefined}
       whileTap={onClick ? { scale: 0.99 } : undefined}
     >
-      <div className="p-5">{children}</div>
+      <div className="p-3 sm:p-5">{children}</div>
     </motion.div>
   );
 }

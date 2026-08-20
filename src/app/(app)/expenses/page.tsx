@@ -102,7 +102,7 @@ export default function ExpensesPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-24 lg:pb-0">
       {/* Hero */}
       <div className="bg-gradient-to-br from-[#F2F3F5] via-[#E8F5E0] to-[#F2F3F5] dark:from-canvas-dark dark:via-canvas-dark-elevated dark:to-canvas-dark rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 mb-6">
         <div className="flex items-center justify-between gap-4">
@@ -120,7 +120,7 @@ export default function ExpensesPage() {
       </div>
 
       {/* History Period Toggle + Date Picker */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-5">
+      <div className="flex flex-wrap items-center gap-3 mb-5">
         <div className="flex items-center gap-1 bg-white dark:bg-canvas-dark-elevated rounded-full p-0.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           {(['daily', 'weekly', 'monthly', 'yearly'] as const).map(v => (
             <button
@@ -206,7 +206,7 @@ export default function ExpensesPage() {
       </div>
 
       {/* Category Filter */}
-      <div className="flex items-center gap-2 mb-5 overflow-x-auto no-scrollbar">
+      <div className="flex flex-wrap items-center gap-2 mb-5">
         <button onClick={() => setCategoryFilter('')} className={cn('px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border-2', !categoryFilter ? 'bg-primary text-on-primary border-primary' : 'border-hairline-light dark:border-hairline-dark text-shade-50 hover:border-shade-30')}>All</button>
         {CATEGORIES.map(cat => (
           <button key={cat.id} onClick={() => setCategoryFilter(cat.id)} className={cn('px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border-2', categoryFilter === cat.id ? 'bg-primary text-on-primary border-primary' : 'border-hairline-light dark:border-hairline-dark text-shade-50 hover:border-shade-30')}>

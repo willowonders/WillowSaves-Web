@@ -60,14 +60,14 @@ export default function DashboardPage() {
   const recentBankTx = [...bankTx, ...gcashTx].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-28 lg:pb-0">
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-[#F2F3F5] via-[#E8F5E0] to-[#F2F3F5] dark:from-canvas-dark dark:via-canvas-dark-elevated dark:to-canvas-dark rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 mb-6">
         <div className="flex items-center gap-4">
           <img 
             src="/hero-mascot.png" 
             alt="Mascot" 
-            className="w-34 h-34 rounded-2xl object-cover flex-shrink-0"
+            className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
           />
           <div>
             <h1 className="text-2xl font-heading font-bold text-ink dark:text-ink-dark">
@@ -85,17 +85,17 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white dark:bg-canvas-dark-elevated rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6">
           <p className="text-xs font-bold uppercase tracking-wider text-shade-50 mb-2">Remaining</p>
-          <p className="text-3xl font-heading font-bold text-ink dark:text-ink-dark tabular-nums">{formatCurrency(stats.remaining)}</p>
+          <p className={cn('text-2xl sm:text-3xl font-heading font-bold tabular-nums', stats.remaining < 0 ? 'text-danger' : 'text-ink dark:text-ink-dark')}>{formatCurrency(stats.remaining)}</p>
           <p className="text-sm text-shade-40 mt-1">Allowance minus expenses and deposits</p>
         </div>
         <div className="bg-white dark:bg-canvas-dark-elevated rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6">
           <p className="text-xs font-bold uppercase tracking-wider text-shade-50 mb-2">Bank Balance</p>
-          <p className="text-3xl font-heading font-bold text-ink dark:text-ink-dark tabular-nums">{formatCurrency(balance)}</p>
+          <p className={cn('text-2xl sm:text-3xl font-heading font-bold tabular-nums', balance < 0 ? 'text-danger' : 'text-ink dark:text-ink-dark')}>{formatCurrency(balance)}</p>
           <p className="text-sm text-shade-40 mt-1">Available in bank</p>
         </div>
         <div className="bg-white dark:bg-canvas-dark-elevated rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6">
           <p className="text-xs font-bold uppercase tracking-wider text-shade-50 mb-2">GCASH Balance</p>
-          <p className="text-3xl font-heading font-bold text-ink dark:text-ink-dark tabular-nums">{formatCurrency(gcashBalance)}</p>
+          <p className={cn('text-2xl sm:text-3xl font-heading font-bold tabular-nums', gcashBalance < 0 ? 'text-danger' : 'text-ink dark:text-ink-dark')}>{formatCurrency(gcashBalance)}</p>
           <p className="text-sm text-shade-40 mt-1">Available in GCASH</p>
         </div>
       </div>
