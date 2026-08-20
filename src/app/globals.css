@@ -1,26 +1,130 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: #2E8540;
+  --color-primary-dark: #1F5C2E;
+  --color-primary-light: #4AA860;
+  --color-primary-subtle: rgba(46, 133, 64, 0.12);
+  --color-ink: #1C1C28;
+  --color-ink-dark: #F5F5F5;
+  --color-on-primary: #ffffff;
+
+  --color-canvas-cream: #FFF9F5;
+  --color-canvas-light: #FFFFFF;
+  --color-canvas-dark: #0D0D0D;
+  --color-canvas-dark-elevated: #1A1A1A;
+  --color-canvas-dark-card: #242424;
+
+  --color-sage-green: #E8F5E0;
+  --color-sage-green-dark: #2D3D2D;
+  --color-pastel-pink: #F8D6E7;
+  --color-baby-blue: #CFE8FF;
+  --color-peach-soft: #FFE2CC;
+
+  --color-shade-20: #E4E4EC;
+  --color-shade-30: #D1D1DA;
+  --color-shade-40: #A0A0B2;
+  --color-shade-50: #7B7B8A;
+  --color-shade-60: #595968;
+  --color-shade-70: #373742;
+
+  --color-success-soft: #B8F5CC;
+  --color-warning-soft: #FFE6B8;
+  --color-danger-soft: #FFD1D1;
+  --color-danger: #DC3545;
+
+  --color-hairline-light: #ECECF3;
+  --color-hairline-dark: #2A2A2A;
+
+  --font-display: "Fredoka", "Poppins", sans-serif;
+  --font-heading: "Poppins", sans-serif;
+  --font-body: "Nunito", "Inter", sans-serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F2F3F5;
+  --foreground: #1C1C28;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --background: #0D0D0D;
+  --foreground: #F5F5F5;
+
+  --color-primary: #69DB7C;
+  --color-primary-dark: #40C057;
+  --color-primary-light: #B2F2BB;
+  --color-primary-subtle: rgba(105, 219, 124, 0.15);
+  --color-on-primary: #0D0D0D;
+
+  --color-canvas-dark: #0D0D0D;
+  --color-canvas-dark-elevated: #1A1A1A;
+  --color-canvas-dark-card: #242424;
+
+  --color-ink: #F5F5F5;
+  --color-ink-dark: #F5F5F5;
+
+  --color-shade-20: #2A2A2A;
+  --color-shade-30: #3A3A3A;
+  --color-shade-40: #555555;
+  --color-shade-50: #777777;
+  --color-shade-60: #999999;
+  --color-shade-70: #BBBBBB;
+
+  --color-success-soft: #1A2E1A;
+  --color-warning-soft: #2A2A1A;
+  --color-danger-soft: #2A1A1A;
+  --color-danger: #FF6B6B;
+
+  --color-hairline-light: #2A2A2A;
+  --color-hairline-dark: #333333;
+
+  --color-sage-green: #1A2E1A;
+  --color-sage-green-dark: #243E24;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-shade-30);
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #333333;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
