@@ -78,9 +78,9 @@ export default function ExpensesPage() {
     return result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [expenses, categoryFilter, historyView, selectedMonth, selectedYear]);
 
-  const handleSave = useCallback((amount: number, category: string, date: string, notes: string) => {
-    if (editing) updateExpense({ ...editing, amount, category, date, notes });
-    else addExpense(amount, category, date, notes);
+  const handleSave = useCallback((amount: number, category: string, date: string, notes: string, source: 'allowance' | 'bank' | 'gcash') => {
+    if (editing) updateExpense({ ...editing, amount, category, date, notes, source });
+    else addExpense(amount, category, date, notes, source);
     setEditing(null);
     setShowForm(false);
   }, [editing, addExpense, updateExpense]);
@@ -102,13 +102,13 @@ export default function ExpensesPage() {
   };
 
   return (
-    <div className="min-h-screen pb-24 lg:pb-0">
+    <div className="min-h-screen pb-24 lg:pb-0 overflow-hidden">
       {/* Hero */}
       <div className="bg-gradient-to-br from-[#F2F3F5] via-[#E8F5E0] to-[#F2F3F5] dark:from-canvas-dark dark:via-canvas-dark-elevated dark:to-canvas-dark rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 mb-6">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1">
             <p className="text-[11px] font-bold uppercase tracking-wider text-shade-50 mb-1">Total Spending</p>
-            <p className="text-4xl font-heading font-light text-ink dark:text-ink-dark tabular-nums">{formatCurrency(analytics.totalSpent)}</p>
+            <p className="text-3xl sm:text-4xl font-heading font-light text-ink dark:text-ink-dark tabular-nums">{formatCurrency(analytics.totalSpent)}</p>
             <p className="text-sm font-medium text-shade-50 mt-2">{expenses.length} expense{expenses.length !== 1 ? 's' : ''} recorded</p>
           </div>
           <img 
@@ -137,7 +137,7 @@ export default function ExpensesPage() {
         </div>
 
         {(historyView === 'monthly' || historyView === 'yearly') && (
-          <div className="relative">
+          <div className="relative overflow-hidden">
             <button
               onClick={() => setShowMonthPicker(!showMonthPicker)}
               className="flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-canvas-dark-elevated rounded-full text-xs font-semibold text-ink dark:text-ink-dark shadow-[0_1px_3px_rgba(0,0,0,0.04)] cursor-pointer"
@@ -216,7 +216,7 @@ export default function ExpensesPage() {
       </div>
 
       {/* Expenses List */}
-      <Card variant="analytics">
+        <Card variant="analytics" className="overflow-hidden">
         <h3 className="text-base font-semibold text-ink dark:text-ink-dark mb-1">Expenses</h3>
         <p className="text-[11px] text-shade-400 mb-4">{filteredExpenses.length} of {expenses.length} shown</p>
         <ExpenseList expenses={filteredExpenses} onEdit={(e) => { setEditing(e); }} onDelete={handleDelete} />
@@ -228,7 +228,7 @@ export default function ExpensesPage() {
       </Modal>
 
       <UndoToast pendingItem={pendingItem} onUndo={() => {
-        if (pendingItem?.type === 'expense') { const d = pendingItem.data as Expense; addExpense(d.amount, d.category, d.date, d.notes); }
+        if (pendingItem?.type === 'expense') { const d = pendingItem.data as Expense; addExpense(d.amount, d.category, d.date, d.notes, d.source || 'allowance'); }
         dismissUndo();
       }} onDismiss={dismissUndo} />
     </div>

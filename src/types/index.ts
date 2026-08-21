@@ -5,6 +5,8 @@ export interface Expense {
   date: string;
   notes: string;
   createdAt: string;
+  source?: 'allowance' | 'bank' | 'gcash';
+  bankTransactionId?: string;
   userId?: string;
 }
 

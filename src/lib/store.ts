@@ -86,7 +86,7 @@ async function initializeStore() {
       supabase.from('bank_state').select('balance').eq('user_id', _userId).eq('id', 'gcash').single(),
     ]);
     const allTx = (bankTxRes.data || []).map((r: any) => ({ id: r.id, amount: r.amount, type: r.type, source: r.source || 'other', account: r.account || 'bank', note: r.note || '', date: r.date, createdAt: r.created_at }));
-    _expenses = (expensesRes.data || []).map((r: any) => ({ id: r.id, amount: r.amount, category: r.category, date: r.date, notes: r.notes || '', createdAt: r.created_at }));
+    _expenses = (expensesRes.data || []).map((r: any) => ({ id: r.id, amount: r.amount, category: r.category, date: r.date, notes: r.notes || '', createdAt: r.created_at, source: r.source || 'allowance', bankTransactionId: r.bank_transaction_id }));
     _allowances = (allowancesRes.data || []).map((r: any) => ({ id: r.id, amount: r.amount, label: r.label, date: r.date, createdAt: r.created_at, linkedTransactionId: r.linked_transaction_id }));
     const bankTx = allTx.filter(t => (t.account || 'bank') === 'bank');
     const gcashTx = allTx.filter(t => t.account === 'gcash');
@@ -131,21 +131,67 @@ export function useUndo() {
   return { pendingItem, queueUndo, dismissUndo };
 }
 
+// ─── Bank Helpers (usable from expense store) ───────────────
+function _bankWithdrawDirect(account: 'bank' | 'gcash', amount: number, note: string): BankTransaction {
+  const stateRef = account === 'bank' ? _bankRef : _gcashRef;
+  const storageKey = account === 'bank' ? 'willow-saves-bank' : 'willow-saves-gcash';
+  const supabaseId = account === 'bank' ? 'main' : 'gcash';
+  const transaction: BankTransaction = { id: generateId(), type: 'withdraw', amount, source: 'other', account, date: getPhilippineDate(), note, createdAt: new Date().toISOString() };
+  const state = stateRef.current;
+  stateRef.current = { balance: Math.max(0, state.balance - amount), transactions: [transaction, ...state.transactions] };
+  saveToStorage(storageKey, stateRef.current);
+  if (USE_SUPABASE && _userId) {
+    supabase.from('bank_transactions').insert({ id: transaction.id, amount, type: 'withdraw', source: 'other', account, note, date: transaction.date, user_id: _userId });
+    supabase.from('bank_state').select('balance').eq('user_id', _userId).eq('id', supabaseId).single().then(({ data }) => {
+      supabase.from('bank_state').upsert({ user_id: _userId, id: supabaseId, balance: Math.max(0, (data?.balance ?? 0) - amount) });
+    });
+  }
+  notify();
+  return transaction;
+}
+
+function _bankDepositDirect(account: 'bank' | 'gcash', amount: number, note: string): BankTransaction {
+  const stateRef = account === 'bank' ? _bankRef : _gcashRef;
+  const storageKey = account === 'bank' ? 'willow-saves-bank' : 'willow-saves-gcash';
+  const supabaseId = account === 'bank' ? 'main' : 'gcash';
+  const transaction: BankTransaction = { id: generateId(), type: 'deposit', amount, source: 'other', account, date: getPhilippineDate(), note, createdAt: new Date().toISOString() };
+  const state = stateRef.current;
+  stateRef.current = { balance: state.balance + amount, transactions: [transaction, ...state.transactions] };
+  saveToStorage(storageKey, stateRef.current);
+  if (USE_SUPABASE && _userId) {
+    supabase.from('bank_transactions').insert({ id: transaction.id, amount, type: 'deposit', source: 'other', account, note, date: transaction.date, user_id: _userId });
+    supabase.from('bank_state').select('balance').eq('user_id', _userId).eq('id', supabaseId).single().then(({ data }) => {
+      supabase.from('bank_state').upsert({ user_id: _userId, id: supabaseId, balance: (data?.balance ?? 0) + amount });
+    });
+  }
+  notify();
+  return transaction;
+}
+
 // ─── Expenses ───────────────────────────────────────────────
 export function useExpensesStore() {
   useSyncStore();
   useEffect(() => { initializeStore(); }, []);
 
-  const addExpense = useCallback(async (amount: number, category: string, date: string, notes: string) => {
-    const newExpense: Expense = { id: generateId(), amount, category, date, notes, createdAt: new Date().toISOString() };
+  const addExpense = useCallback(async (amount: number, category: string, date: string, notes: string, source: 'allowance' | 'bank' | 'gcash' = 'allowance') => {
+    let bankTransactionId: string | undefined;
+    if (source === 'bank' || source === 'gcash') {
+      const tx = _bankWithdrawDirect(source, amount, `Expense: ${category}${notes ? ` — ${notes}` : ''}`);
+      bankTransactionId = tx.id;
+    }
+    const newExpense: Expense = { id: generateId(), amount, category, date, notes, createdAt: new Date().toISOString(), source, bankTransactionId };
     _expenses = [newExpense, ..._expenses];
     saveToStorage('willow-saves-expenses', _expenses);
-    if (USE_SUPABASE && _userId) await supabase.from('expenses').insert({ id: newExpense.id, amount, category, date, notes, user_id: _userId });
+    if (USE_SUPABASE && _userId) await supabase.from('expenses').insert({ id: newExpense.id, amount, category, date, notes, source, bank_transaction_id: bankTransactionId || null, user_id: _userId });
     notify();
     return newExpense;
   }, []);
 
   const deleteExpense = useCallback(async (id: string) => {
+    const expense = _expenses.find(e => e.id === id);
+    if (expense?.bankTransactionId && expense.source) {
+      _bankDepositDirect(expense.source as 'bank' | 'gcash', expense.amount, `Refund: ${expense.category}`);
+    }
     _expenses = _expenses.filter(e => e.id !== id);
     saveToStorage('willow-saves-expenses', _expenses);
     if (USE_SUPABASE) await supabase.from('expenses').delete().eq('id', id);
@@ -153,9 +199,34 @@ export function useExpensesStore() {
   }, []);
 
   const updateExpense = useCallback(async (updated: Expense) => {
+    const old = _expenses.find(e => e.id === updated.id);
+    if (old) {
+      const oldSource = old.source || 'allowance';
+      const newSource = updated.source || 'allowance';
+      const oldAccount = oldSource as 'bank' | 'gcash';
+      const newAccount = newSource as 'bank' | 'gcash';
+
+      if (oldSource !== 'allowance' && newSource !== 'allowance') {
+        if (oldAccount !== newAccount) {
+          _bankDepositDirect(oldAccount, old.amount, `Refund: ${old.category}`);
+          const tx = _bankWithdrawDirect(newAccount, updated.amount, `Expense: ${updated.category}${updated.notes ? ` — ${updated.notes}` : ''}`);
+          updated.bankTransactionId = tx.id;
+        } else {
+          _bankDepositDirect(oldAccount, old.amount, `Refund: ${old.category}`);
+          const tx = _bankWithdrawDirect(newAccount, updated.amount, `Expense: ${updated.category}${updated.notes ? ` — ${updated.notes}` : ''}`);
+          updated.bankTransactionId = tx.id;
+        }
+      } else if (oldSource !== 'allowance' && newSource === 'allowance') {
+        _bankDepositDirect(oldAccount, old.amount, `Refund: ${old.category}`);
+        updated.bankTransactionId = undefined;
+      } else if (oldSource === 'allowance' && newSource !== 'allowance') {
+        const tx = _bankWithdrawDirect(newAccount, updated.amount, `Expense: ${updated.category}${updated.notes ? ` — ${updated.notes}` : ''}`);
+        updated.bankTransactionId = tx.id;
+      }
+    }
     _expenses = _expenses.map(e => (e.id === updated.id ? updated : e));
     saveToStorage('willow-saves-expenses', _expenses);
-    if (USE_SUPABASE) await supabase.from('expenses').update({ amount: updated.amount, category: updated.category, date: updated.date, notes: updated.notes }).eq('id', updated.id);
+    if (USE_SUPABASE && _userId) await supabase.from('expenses').update({ amount: updated.amount, category: updated.category, date: updated.date, notes: updated.notes, source: updated.source || 'allowance', bank_transaction_id: updated.bankTransactionId || null }).eq('id', updated.id);
     notify();
   }, []);
 
@@ -293,7 +364,7 @@ export function useSavings() {
   useEffect(() => { initializeStore(); }, []);
 
   const totalSaved = _allowances.reduce((sum, a) => sum + a.amount, 0);
-  const totalExpenses = _expenses.reduce((sum, e) => sum + e.amount, 0);
+  const totalExpenses = _expenses.filter(e => !e.source || e.source === 'allowance').reduce((sum, e) => sum + e.amount, 0);
   const totalBankDeposited = _bankState.transactions.filter(t => t.type === 'deposit' && t.source === 'savings').reduce((sum, t) => sum + t.amount, 0);
   const totalBankWithdrawn = _bankState.transactions.filter(t => t.type === 'withdraw').reduce((sum, t) => sum + t.amount, 0);
   const totalGcashDeposited = _gcashState.transactions.filter(t => t.type === 'deposit' && t.source === 'savings').reduce((sum, t) => sum + t.amount, 0);

@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface ExpenseFormProps {
   editingExpense?: Expense | null;
-  onSave: (amount: number, category: string, date: string, notes: string) => void;
+  onSave: (amount: number, category: string, date: string, notes: string, source: 'allowance' | 'bank' | 'gcash') => void;
   onClose: () => void;
 }
 
@@ -18,11 +18,12 @@ export function ExpenseForm({ editingExpense, onSave, onClose }: ExpenseFormProp
   const [category, setCategory] = useState(editingExpense?.category || '');
   const [notes, setNotes] = useState(editingExpense?.notes || '');
   const [date, setDate] = useState(editingExpense?.date || new Date().toISOString().split('T')[0]);
+  const [source, setSource] = useState<'allowance' | 'bank' | 'gcash'>(editingExpense?.source || 'allowance');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount || !category || !date) return;
-    onSave(parseFloat(amount), category, date, notes);
+    onSave(parseFloat(amount), category, date, notes, source);
   };
 
   return (
@@ -67,6 +68,32 @@ export function ExpenseForm({ editingExpense, onSave, onClose }: ExpenseFormProp
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* Source */}
+      <div>
+        <label className="text-sm font-semibold text-ink dark:text-ink-dark mb-2 block">Pay From</label>
+        <div className="flex gap-2">
+          {([
+            { id: 'allowance' as const, label: 'Allowance' },
+            { id: 'bank' as const, label: 'Bank' },
+            { id: 'gcash' as const, label: 'GCASH' },
+          ]).map(s => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setSource(s.id)}
+              className={cn(
+                'flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer',
+                source === s.id
+                  ? 'bg-primary text-on-primary ring-2 ring-primary'
+                  : 'bg-shade-20/40 dark:bg-shade-70/40 text-shade-60 dark:text-shade-40 hover:bg-shade-30/40'
+              )}
+            >
+              {s.label}
+            </button>
+          ))}
         </div>
       </div>
 

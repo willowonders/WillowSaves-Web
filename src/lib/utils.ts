@@ -120,8 +120,8 @@ interface StatsResult {
   savingsRate: number;
 }
 
-export function calculateStats(expenses: { amount: number }[], totalSaved: number, totalDeposited: number = 0, totalWithdrawn: number = 0): StatsResult {
-  const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
+export function calculateStats(expenses: { amount: number; source?: string }[], totalSaved: number, totalDeposited: number = 0, totalWithdrawn: number = 0): StatsResult {
+  const totalSpent = expenses.filter(e => !e.source || e.source === 'allowance').reduce((sum, e) => sum + e.amount, 0);
   const remaining = totalSaved - totalSpent - totalDeposited + totalWithdrawn;
   const savingsRate = totalSaved > 0 ? Math.max(0, (remaining / totalSaved) * 100) : 0;
 

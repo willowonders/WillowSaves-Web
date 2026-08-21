@@ -24,7 +24,7 @@ export function GlobalModals() {
         <motion.div key="expense-modal-global" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-white dark:bg-canvas-dark-elevated rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-heading font-bold text-ink dark:text-ink-dark mb-4">New Expense</h2>
-            <ExpenseForm onSave={(amount: number, category: string, date: string, notes: string) => { addExpense(amount, category, date, notes); closeModal(); }} onClose={closeModal} />
+            <ExpenseForm onSave={(amount: number, category: string, date: string, notes: string, source: 'allowance' | 'bank' | 'gcash') => { addExpense(amount, category, date, notes, source); closeModal(); }} onClose={closeModal} />
           </motion.div>
         </motion.div>
       )}

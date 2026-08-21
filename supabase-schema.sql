@@ -7,6 +7,8 @@ create table if not exists expenses (
   category text not null,
   date text not null,
   notes text default '',
+  source text default 'allowance',
+  bank_transaction_id text,
   created_at timestamp with time zone default now(),
   user_id uuid references auth.users(id) not null
 );

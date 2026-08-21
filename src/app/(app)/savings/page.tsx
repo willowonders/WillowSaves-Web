@@ -94,7 +94,7 @@ export default function SavingsPage() {
 
       {/* Period Toggle */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1 bg-white dark:bg-canvas-dark-elevated rounded-full p-0.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             {(['weekly', 'monthly', 'yearly'] as const).map(v => (
               <button
@@ -126,7 +126,7 @@ export default function SavingsPage() {
                     initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
-                    className="absolute left-0 top-full mt-2 bg-white dark:bg-canvas-dark-elevated rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] border border-hairline-light dark:border-hairline-dark p-3 z-50 w-56"
+                    className="relative lg:absolute lg:top-full lg:left-0 mt-2 bg-white dark:bg-canvas-dark-elevated rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] border border-hairline-light dark:border-hairline-dark p-3 z-50 w-full lg:w-56"
                   >
                     {analyticsView === 'monthly' && (
                       <div className="mb-3">

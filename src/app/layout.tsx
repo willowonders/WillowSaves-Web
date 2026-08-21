@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Nunito, Poppins, Fredoka } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { AuthProvider } from "@/lib/auth-context";
@@ -54,13 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </AuthProvider>
         </ThemeProvider>
-        <script dangerouslySetInnerHTML={{ __html: `
-          if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/sw.js');
-            });
-          }
-        ` }} />
+        <Script src="/sw.js" strategy="afterInteractive" />
       </body>
     </html>
   );

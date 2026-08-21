@@ -123,7 +123,7 @@ export default function DashboardPage() {
             </div>
 
             {(analyticsView === 'monthly' || analyticsView === 'yearly') && (
-              <div className="relative">
+              <div className="relative overflow-hidden">
                 <button
                   onClick={() => setShowMonthPicker(!showMonthPicker)}
                   className="flex items-center gap-1.5 px-3 py-1 bg-shade-20/40 dark:bg-shade-70/40 rounded-full text-xs font-semibold text-ink dark:text-ink-dark cursor-pointer"
