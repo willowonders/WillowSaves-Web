@@ -24,7 +24,7 @@ export interface BankTransaction {
   id: string;
   amount: number;
   type: 'deposit' | 'withdraw';
-  source?: 'savings' | 'other';
+  source?: 'savings' | 'other' | 'expense';
   account?: 'bank' | 'gcash';
   note: string;
   date: string;

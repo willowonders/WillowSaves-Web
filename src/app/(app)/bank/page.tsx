@@ -31,10 +31,11 @@ export default function BankPage() {
     if (!pendingItem || pendingItem.type !== 'bank') return;
     const tx = pendingItem.data as BankTransaction;
     if (tx.type === 'deposit') {
+      const depositSource = tx.source === 'expense' ? 'other' : (tx.source || 'other');
       if (tx.account === 'gcash') {
-        gcash.deposit(tx.amount, tx.source || 'other', tx.note);
+        gcash.deposit(tx.amount, depositSource, tx.note);
       } else {
-        bank.deposit(tx.amount, tx.source || 'other', tx.note);
+        bank.deposit(tx.amount, depositSource, tx.note);
       }
     } else {
       if (tx.account === 'gcash') {

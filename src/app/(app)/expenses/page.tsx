@@ -78,9 +78,9 @@ export default function ExpensesPage() {
     return result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [expenses, categoryFilter, historyView, selectedMonth, selectedYear]);
 
-  const handleSave = useCallback((amount: number, category: string, date: string, notes: string, source: 'allowance' | 'bank' | 'gcash') => {
-    if (editing) updateExpense({ ...editing, amount, category, date, notes, source });
-    else addExpense(amount, category, date, notes, source);
+  const handleSave = useCallback(async (amount: number, category: string, date: string, notes: string, source: 'allowance' | 'bank' | 'gcash') => {
+    if (editing) await updateExpense({ ...editing, amount, category, date, notes, source });
+    else await addExpense(amount, category, date, notes, source);
     setEditing(null);
     setShowForm(false);
   }, [editing, addExpense, updateExpense]);

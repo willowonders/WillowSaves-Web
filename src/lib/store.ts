@@ -136,15 +136,13 @@ function _bankWithdrawDirect(account: 'bank' | 'gcash', amount: number, note: st
   const stateRef = account === 'bank' ? _bankRef : _gcashRef;
   const storageKey = account === 'bank' ? 'willow-saves-bank' : 'willow-saves-gcash';
   const supabaseId = account === 'bank' ? 'main' : 'gcash';
-  const transaction: BankTransaction = { id: generateId(), type: 'withdraw', amount, source: 'other', account, date: getPhilippineDate(), note, createdAt: new Date().toISOString() };
+  const transaction: BankTransaction = { id: generateId(), type: 'withdraw', amount, source: 'expense', account, date: getPhilippineDate(), note, createdAt: new Date().toISOString() };
   const state = stateRef.current;
   stateRef.current = { balance: Math.max(0, state.balance - amount), transactions: [transaction, ...state.transactions] };
   saveToStorage(storageKey, stateRef.current);
   if (USE_SUPABASE && _userId) {
-    supabase.from('bank_transactions').insert({ id: transaction.id, amount, type: 'withdraw', source: 'other', account, note, date: transaction.date, user_id: _userId });
-    supabase.from('bank_state').select('balance').eq('user_id', _userId).eq('id', supabaseId).single().then(({ data }) => {
-      supabase.from('bank_state').upsert({ user_id: _userId, id: supabaseId, balance: Math.max(0, (data?.balance ?? 0) - amount) });
-    });
+    supabase.from('bank_transactions').insert({ id: transaction.id, amount, type: 'withdraw', source: 'expense', account, note, date: transaction.date, user_id: _userId });
+    supabase.from('bank_state').upsert({ user_id: _userId, id: supabaseId, balance: stateRef.current.balance });
   }
   notify();
   return transaction;
@@ -160,9 +158,7 @@ function _bankDepositDirect(account: 'bank' | 'gcash', amount: number, note: str
   saveToStorage(storageKey, stateRef.current);
   if (USE_SUPABASE && _userId) {
     supabase.from('bank_transactions').insert({ id: transaction.id, amount, type: 'deposit', source: 'other', account, note, date: transaction.date, user_id: _userId });
-    supabase.from('bank_state').select('balance').eq('user_id', _userId).eq('id', supabaseId).single().then(({ data }) => {
-      supabase.from('bank_state').upsert({ user_id: _userId, id: supabaseId, balance: (data?.balance ?? 0) + amount });
-    });
+    supabase.from('bank_state').upsert({ user_id: _userId, id: supabaseId, balance: stateRef.current.balance });
   }
   notify();
   return transaction;
@@ -182,7 +178,11 @@ export function useExpensesStore() {
     const newExpense: Expense = { id: generateId(), amount, category, date, notes, createdAt: new Date().toISOString(), source, bankTransactionId };
     _expenses = [newExpense, ..._expenses];
     saveToStorage('willow-saves-expenses', _expenses);
-    if (USE_SUPABASE && _userId) await supabase.from('expenses').insert({ id: newExpense.id, amount, category, date, notes, source, bank_transaction_id: bankTransactionId || null, user_id: _userId });
+    try {
+      if (USE_SUPABASE && _userId) await supabase.from('expenses').insert({ id: newExpense.id, amount, category, date, notes, source, bank_transaction_id: bankTransactionId || null, user_id: _userId });
+    } catch (e) {
+      console.error('Failed to save expense to Supabase:', e);
+    }
     notify();
     return newExpense;
   }, []);
@@ -366,9 +366,9 @@ export function useSavings() {
   const totalSaved = _allowances.reduce((sum, a) => sum + a.amount, 0);
   const totalExpenses = _expenses.filter(e => !e.source || e.source === 'allowance').reduce((sum, e) => sum + e.amount, 0);
   const totalBankDeposited = _bankState.transactions.filter(t => t.type === 'deposit' && t.source === 'savings').reduce((sum, t) => sum + t.amount, 0);
-  const totalBankWithdrawn = _bankState.transactions.filter(t => t.type === 'withdraw').reduce((sum, t) => sum + t.amount, 0);
+  const totalBankWithdrawn = _bankState.transactions.filter(t => t.type === 'withdraw' && t.source !== 'expense').reduce((sum, t) => sum + t.amount, 0);
   const totalGcashDeposited = _gcashState.transactions.filter(t => t.type === 'deposit' && t.source === 'savings').reduce((sum, t) => sum + t.amount, 0);
-  const totalGcashWithdrawn = _gcashState.transactions.filter(t => t.type === 'withdraw').reduce((sum, t) => sum + t.amount, 0);
+  const totalGcashWithdrawn = _gcashState.transactions.filter(t => t.type === 'withdraw' && t.source !== 'expense').reduce((sum, t) => sum + t.amount, 0);
   const totalDeposited = totalBankDeposited + totalGcashDeposited;
   const totalWithdrawn = totalBankWithdrawn + totalGcashWithdrawn;
   const savings = totalSaved - totalExpenses - totalDeposited + totalWithdrawn;
