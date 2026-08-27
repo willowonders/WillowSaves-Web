@@ -52,6 +52,7 @@ export default function DashboardPage() {
   });
 
   const filteredStats = calculateStats(filteredExpenses, totalSaved, totalDeposited, totalWithdrawn);
+  const filteredTotalSpent = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
   const months = Array.from({ length: 12 }, (_, i) => getMonthName(i));
   const years = [selectedYear - 1, selectedYear, selectedYear + 1];
 
@@ -187,7 +188,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 gap-3 mb-5">
           <div className="bg-shade-20/20 dark:bg-shade-70/20 rounded-xl p-3">
             <p className="text-[11px] text-shade-50 font-semibold uppercase tracking-wider">Spent</p>
-            <p className="text-xl font-heading font-bold text-danger tabular-nums mt-1">{formatCurrency(filteredStats.totalSpent)}</p>
+            <p className="text-xl font-heading font-bold text-danger tabular-nums mt-1">{formatCurrency(filteredTotalSpent)}</p>
           </div>
           <div className="bg-shade-20/20 dark:bg-shade-70/20 rounded-xl p-3">
             <p className="text-[11px] text-shade-50 font-semibold uppercase tracking-wider">Savings Rate</p>

@@ -53,6 +53,10 @@ export function getPhilippineDate(): string {
   return utc8.toISOString().split('T')[0];
 }
 
+export function formatLocalDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 export function formatDate(dateStr: string): string {
   return new Date(dateStr + 'T00:00:00Z').toLocaleDateString('en-US', {
     month: 'short',

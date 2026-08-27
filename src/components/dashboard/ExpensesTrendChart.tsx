@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { Expense } from '@/types';
-import { getMonthName } from '@/lib/utils';
+import { getMonthName, formatLocalDate } from '@/lib/utils';
 import { TrendingDown } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -31,7 +31,7 @@ export function ExpensesTrendChart({ expenses, view, selectedMonth, selectedYear
       return Array.from({ length: 7 }, (_, i) => {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
-        const dayStr = d.toISOString().split('T')[0];
+        const dayStr = formatLocalDate(d);
         const dayExpenses = expenses.filter(e => e.date === dayStr);
         const label = `${d.toLocaleDateString('en-US', { month: 'short' })} ${d.getDate()}`;
         return { label, amount: dayExpenses.reduce((s, e) => s + e.amount, 0) };
@@ -51,10 +51,9 @@ export function ExpensesTrendChart({ expenses, view, selectedMonth, selectedYear
         weekEnd.setDate(weekStart.getDate() + 6);
         if (weekEnd > lastDay) weekEnd.setTime(lastDay.getTime());
 
-        const weekExpenses = expenses.filter(e => {
-          const d = new Date(e.date + 'T00:00:00Z');
-          return d >= weekStart && d <= weekEnd;
-        });
+        const weekStartStr = formatLocalDate(weekStart);
+        const weekEndStr = formatLocalDate(weekEnd);
+        const weekExpenses = expenses.filter(e => e.date >= weekStartStr && e.date <= weekEndStr);
         return {
           label: `W${i + 1}`,
           amount: weekExpenses.reduce((s, e) => s + e.amount, 0),

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { getMonthName } from '@/lib/utils';
+import { getMonthName, formatLocalDate } from '@/lib/utils';
 import { BarChart3 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -32,7 +32,7 @@ export function SavingsChart({ view, selectedMonth, selectedYear }: SavingsChart
       return Array.from({ length: 7 }, (_, i) => {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
-        const dayStr = d.toISOString().split('T')[0];
+        const dayStr = formatLocalDate(d);
         const dayAllowances = allowances.filter(a => a.date === dayStr);
         const label = `${d.toLocaleDateString('en-US', { month: 'short' })} ${d.getDate()}`;
         return { label, amount: dayAllowances.reduce((s, a) => s + a.amount, 0) };
@@ -53,10 +53,9 @@ export function SavingsChart({ view, selectedMonth, selectedYear }: SavingsChart
         weekEnd.setDate(weekStart.getDate() + 6);
         if (weekEnd > lastDay) weekEnd.setTime(lastDay.getTime());
 
-        const weekAllowances = allowances.filter(a => {
-          const d = new Date(a.date + 'T00:00:00Z');
-          return d >= weekStart && d <= weekEnd;
-        });
+        const weekStartStr = formatLocalDate(weekStart);
+        const weekEndStr = formatLocalDate(weekEnd);
+        const weekAllowances = allowances.filter(a => a.date >= weekStartStr && a.date <= weekEndStr);
         return {
           label: `W${i + 1}`,
           amount: weekAllowances.reduce((s, a) => s + a.amount, 0),
