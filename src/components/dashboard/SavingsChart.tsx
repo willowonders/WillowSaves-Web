@@ -10,16 +10,14 @@ import { useAllowances } from '@/lib/store';
 
 interface SavingsChartProps {
   view: 'daily' | 'weekly' | 'monthly' | 'yearly';
-  selectedMonth?: number;
   selectedYear?: number;
 }
 
-export function SavingsChart({ view, selectedMonth, selectedYear }: SavingsChartProps) {
+export function SavingsChart({ view, selectedYear }: SavingsChartProps) {
   const { allowances } = useAllowances();
 
   const chartData = useMemo(() => {
     const now = new Date();
-    const sm = selectedMonth ?? now.getMonth();
     const sy = selectedYear ?? now.getFullYear();
 
     if (view === 'daily') {
@@ -88,7 +86,7 @@ export function SavingsChart({ view, selectedMonth, selectedYear }: SavingsChart
         amount: yearAllowances.reduce((s, a) => s + a.amount, 0),
       };
     });
-  }, [allowances, view, selectedMonth, selectedYear]);
+  }, [allowances, view, selectedYear]);
 
   return (
     <div>

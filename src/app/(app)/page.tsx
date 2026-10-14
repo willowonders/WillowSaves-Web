@@ -1,7 +1,7 @@
 'use client';
 
 import { useExpenses, useBank, useAllowances, useSavings, useGcash } from '@/lib/store';
-import { formatCurrency, getMonthName, cn, calculateStats } from '@/lib/utils';
+import { formatCurrency, cn, calculateStats } from '@/lib/utils';
 import { SavingsChart } from '@/components/dashboard/SavingsChart';
 import { ExpensesTrendChart } from '@/components/dashboard/ExpensesTrendChart';
 
@@ -20,11 +20,11 @@ export default function DashboardPage() {
   const savingsRate = stats.totalIncome > 0 ? ((stats.totalIncome - stats.totalSpent) / stats.totalIncome) * 100 : 0;
 
   const [analyticsView, setAnalyticsView] = useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('monthly');
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [showMonthPicker, setShowMonthPicker] = useState(false);
 
   const now = new Date();
+  const effectiveYear = analyticsView === 'yearly' ? now.getFullYear() : selectedYear;
   const filteredExpenses = expenses.filter(e => {
     const d = new Date(e.date + 'T00:00:00Z');
     if (analyticsView === 'daily') {
@@ -43,17 +43,16 @@ export default function DashboardPage() {
       return d >= firstDay && d <= lastDay;
     }
     if (analyticsView === 'monthly') {
-      return d.getUTCMonth() === selectedMonth && d.getUTCFullYear() === selectedYear;
+      return d.getUTCFullYear() === selectedYear;
     }
     if (analyticsView === 'yearly') {
-      return d.getUTCFullYear() === selectedYear;
+      return d.getUTCFullYear() === now.getFullYear();
     }
     return true;
   });
 
   const filteredStats = calculateStats(filteredExpenses, totalSaved, totalDeposited, totalWithdrawn);
   const filteredTotalSpent = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
-  const months = Array.from({ length: 12 }, (_, i) => getMonthName(i));
   const years = [selectedYear - 1, selectedYear, selectedYear + 1];
 
   const recentExpenses = expenses.slice(0, 5);
@@ -110,7 +109,7 @@ export default function DashboardPage() {
               {(['daily', 'weekly', 'monthly', 'yearly'] as const).map(v => (
                 <button
                   key={v}
-                  onClick={() => setAnalyticsView(v)}
+                  onClick={() => { setAnalyticsView(v); setShowMonthPicker(false); }}
                   className={cn(
                     'px-3 py-1 rounded-full text-xs font-semibold transition-all capitalize cursor-pointer',
                     analyticsView === v
@@ -123,13 +122,13 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            {(analyticsView === 'monthly' || analyticsView === 'yearly') && (
-              <div className="relative overflow-hidden">
+            {analyticsView === 'monthly' && (
+              <div className="relative">
                 <button
                   onClick={() => setShowMonthPicker(!showMonthPicker)}
                   className="flex items-center gap-1.5 px-3 py-1 bg-shade-20/40 dark:bg-shade-70/40 rounded-full text-xs font-semibold text-ink dark:text-ink-dark cursor-pointer"
                 >
-                  {analyticsView === 'monthly' ? `${months[selectedMonth]} ${selectedYear}` : selectedYear}
+                  {selectedYear}
                   <ChevronDown size={12} />
                 </button>
 
@@ -139,27 +138,8 @@ export default function DashboardPage() {
                       initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
-                      className="relative lg:absolute lg:top-full lg:right-0 mt-2 bg-white dark:bg-canvas-dark-elevated rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] border border-hairline-light dark:border-hairline-dark p-3 z-50 w-full lg:w-56"
+                      className="absolute top-full right-0 mt-2 bg-white dark:bg-canvas-dark-elevated rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] border border-hairline-light dark:border-hairline-dark p-3 z-50 w-56"
                     >
-                      {analyticsView === 'monthly' && (
-                        <div className="mb-3">
-                          <p className="text-[10px] uppercase tracking-wider text-shade-400 font-bold mb-2">Month</p>
-                          <div className="grid grid-cols-4 gap-1">
-                            {months.map((m, i) => (
-                              <button
-                                key={i}
-                                onClick={() => setSelectedMonth(i)}
-                                className={cn(
-                                  'px-2 py-1.5 rounded-lg text-[11px] font-semibold cursor-pointer',
-                                  selectedMonth === i ? 'bg-primary text-on-primary' : 'text-shade-60 hover:bg-shade-20/50'
-                                )}
-                              >
-                                {m}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                       <div>
                         <p className="text-[10px] uppercase tracking-wider text-shade-400 font-bold mb-2">Year</p>
                         <div className="flex gap-1">
@@ -197,8 +177,8 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <SavingsChart view={analyticsView} selectedMonth={selectedMonth} selectedYear={selectedYear} />
-          <ExpensesTrendChart expenses={filteredExpenses} view={analyticsView} selectedMonth={selectedMonth} selectedYear={selectedYear} />
+          <SavingsChart view={analyticsView} selectedYear={effectiveYear} />
+          <ExpensesTrendChart expenses={expenses} view={analyticsView} selectedYear={effectiveYear} />
         </div>
       </div>
 

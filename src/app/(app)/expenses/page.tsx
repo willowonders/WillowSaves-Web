@@ -125,7 +125,7 @@ export default function ExpensesPage() {
           {(['daily', 'weekly', 'monthly', 'yearly'] as const).map(v => (
             <button
               key={v}
-              onClick={() => setHistoryView(v)}
+              onClick={() => { setHistoryView(v); setShowMonthPicker(false); }}
               className={cn(
                 'px-3 py-1 rounded-full text-xs font-semibold transition-all capitalize cursor-pointer',
                 historyView === v ? 'bg-primary text-on-primary shadow-sm' : 'text-shade-50'
@@ -137,7 +137,7 @@ export default function ExpensesPage() {
         </div>
 
         {(historyView === 'monthly' || historyView === 'yearly') && (
-          <div className="relative overflow-hidden">
+          <div className="relative">
             <button
               onClick={() => setShowMonthPicker(!showMonthPicker)}
               className="flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-canvas-dark-elevated rounded-full text-xs font-semibold text-ink dark:text-ink-dark shadow-[0_1px_3px_rgba(0,0,0,0.04)] cursor-pointer"
@@ -152,7 +152,7 @@ export default function ExpensesPage() {
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
-                  className="relative lg:absolute lg:top-full lg:left-0 mt-2 bg-white dark:bg-canvas-dark-elevated rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] border border-hairline-light dark:border-hairline-dark p-3 z-50 w-full lg:w-56"
+                  className="absolute top-full left-0 mt-2 bg-white dark:bg-canvas-dark-elevated rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] border border-hairline-light dark:border-hairline-dark p-3 z-50 w-56"
                 >
                   {historyView === 'monthly' && (
                     <div className="mb-3">

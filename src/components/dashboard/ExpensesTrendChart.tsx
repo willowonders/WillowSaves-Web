@@ -11,14 +11,12 @@ import {
 interface ExpensesTrendChartProps {
   expenses: Expense[];
   view: 'daily' | 'weekly' | 'monthly' | 'yearly';
-  selectedMonth?: number;
   selectedYear?: number;
 }
 
-export function ExpensesTrendChart({ expenses, view, selectedMonth, selectedYear }: ExpensesTrendChartProps) {
+export function ExpensesTrendChart({ expenses, view, selectedYear }: ExpensesTrendChartProps) {
   const chartData = useMemo(() => {
     const now = new Date();
-    const sm = selectedMonth ?? now.getMonth();
     const sy = selectedYear ?? now.getFullYear();
 
     if (view === 'daily') {
@@ -86,7 +84,7 @@ export function ExpensesTrendChart({ expenses, view, selectedMonth, selectedYear
         amount: yearExpenses.reduce((s, e) => s + e.amount, 0),
       };
     });
-  }, [expenses, view, selectedMonth, selectedYear]);
+  }, [expenses, view, selectedYear]);
 
   return (
     <div>
